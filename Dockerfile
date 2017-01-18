@@ -32,6 +32,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     autoconf \
     g++ \
     make \
+    # libssl-dev \
+    # libcurl4-openssl-dev \
+    # libsasl2-dev \
+    # libcurl3 \
     --no-install-recommends && rm -r /var/lib/apt/lists/* \
     && apt-get --purge autoremove -y
 
@@ -45,8 +49,8 @@ RUN mkdir -p /usr/local/openssl/include/openssl/ && \
 # NODE JS
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
     apt-get install nodejs -qq && \
-    npm install -g gulp
-    
+    npm install -g gulp-cli 
+
 # YARN
 RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 
@@ -55,8 +59,7 @@ RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 RUN bash -c 'debconf-set-selections <<< "mysql-server-5.7 mysql-server/root_password password $MYSQL_ROOT_PASS"' && \
 		bash -c 'debconf-set-selections <<< "mysql-server-5.7 mysql-server/root_password_again password $MYSQL_ROOT_PASS"' && \
 		DEBIAN_FRONTEND=noninteractive apt-get update && \
-		DEBIAN_FRONTEND=noninteractive apt-get install -qqy mysql-server-5.7
-		
+		DEBIAN_FRONTEND=noninteractive apt-get install -qqy mysql-server-5.7		
 # PHP Extensions
 RUN add-apt-repository -y ppa:ondrej/php && \
     DEBIAN_FRONTEND=noninteractive apt-get update && \
@@ -82,8 +85,8 @@ RUN wget --no-check-certificate https://xdebug.org/files/xdebug-2.4.0rc4.tgz && 
     echo 'xdebug.remote_enable=1' >> /etc/php/7.0/cli/conf.d/20-xdebug.ini
 
 # Time Zone
-RUN echo "date.timezone=America/Sao_Paulo" > /etc/php/7.0/cli/conf.d/date_timezone.ini && \
-    echo "date.timezone=America/Sao_Paulo" > /etc/php/7.0/fpm/conf.d/date_timezone.ini
+RUN echo "date.timezone = UTC" > /etc/php/7.0/cli/conf.d/date_timezone.ini && \
+    echo "date.timezone = UTC" > /etc/php/7.0/fpm/conf.d/date_timezone.ini
 
 VOLUME /root/composer
 
@@ -103,8 +106,13 @@ RUN composer selfupdate && \
     ln -s /tmp/vendor/bin/phpunit /usr/local/bin/phpunit && \
     rm -rf /root/.composer/cache/*
 
+# Deployer
+RUN curl -L http://deployer.org/deployer.phar -o deployer.phar && \
+    mv deployer.phar /usr/local/bin/dep && \
+    chmod +x /usr/local/bin/dep
+
 RUN service php7.0-fpm restart
 
 RUN apt-get clean -y && \
-		apt-get autoremove -y && \
+        apt-get autoremove -y && \
 		rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
