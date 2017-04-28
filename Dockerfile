@@ -14,7 +14,7 @@ ENV LC_ALL     en_US.UTF-8
 RUN locale-gen en_US.UTF-8
 
 # MYSQL ROOT PASSWORD
-ARG MYSQL_ROOT_PASS=root    
+ARG MYSQL_ROOT_PASS=root
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
@@ -49,7 +49,7 @@ RUN mkdir -p /usr/local/openssl/include/openssl/ && \
 # NODE JS
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
     apt-get install nodejs -qq && \
-    npm install -g gulp-cli 
+    npm install -g gulp-cli
 
 # YARN
 RUN curl -o- -L https://yarnpkg.com/install.sh | bash
@@ -59,11 +59,11 @@ RUN curl -o- -L https://yarnpkg.com/install.sh | bash
 RUN bash -c 'debconf-set-selections <<< "mysql-server-5.7 mysql-server/root_password password $MYSQL_ROOT_PASS"' && \
 		bash -c 'debconf-set-selections <<< "mysql-server-5.7 mysql-server/root_password_again password $MYSQL_ROOT_PASS"' && \
 		DEBIAN_FRONTEND=noninteractive apt-get update && \
-		DEBIAN_FRONTEND=noninteractive apt-get install -qqy mysql-server-5.7		
+		DEBIAN_FRONTEND=noninteractive apt-get install -qqy mysql-server-5.7
 # PHP Extensions
 RUN add-apt-repository -y ppa:ondrej/php && \
     DEBIAN_FRONTEND=noninteractive apt-get update && \
-    apt-get install -y -qq php-pear php7.0-dev php7.0-fpm php7.0-mcrypt php7.0-soap php7.0-zip php7.0-xml php7.0-mbstring php7.0-curl php7.0-json php7.0-mysql php7.0-tokenizer php7.0-cli php7.0-imap && \
+    apt-get install -y -qq php-pear php7.0-dev php7.0-fpm php7.0-mcrypt php7.0-soap php7.0-zip php7.0-xml php7.0-mbstring php7.0-curl php7.0-json php7.0-mysql php7.0-tokenizer php7.0-cli php7.0-imap php7.0-imagick && \
     apt-get remove --purge php5 php5-common
 
 # MONGO extension
